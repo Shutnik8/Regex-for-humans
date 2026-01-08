@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Regex для людей | Быстрые шаблоны</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, system-ui, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        color: white;
+        padding: 30px 20px;
+        margin-bottom: 30px;
+      }
+      h1 {
+        font-size: 36px;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+      .subtitle {
+        font-size: 18px;
+        opacity: 0.9;
+        margin-bottom: 20px;
+      }
+
+      .donation-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Центрируем содержимое */
+        justify-content: center; /* Центрируем содержимое */
+        text-align: center; /* Центрируем текст */
+      }
+      .donation-title {
+        color: white;
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 18px;
+      }
+      .donation-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 15px;
+      }
+      .donation-btn {
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        min-width: 120px;
+      }
+      .donation-btn:hover {
+        background: #5568d3;
+        color: white;
+        transform: translateY(-2px);
+      }
+      .donation-iframe {
+        text-align: center;
+        margin-top: 10px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Центрируем iframe */
+        justify-content: center; /* Центрируем iframe */
+      }
+
+      /* Стили для центровки iframe */
+      .donation-iframe iframe {
+        display: block;
+        margin: 0 auto; /* Центрируем по горизонтали */
+      }
+
+      .main-content {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      .section-title {
+        color: #667eea;
+        margin-bottom: 25px;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .section-title i {
+        font-size: 20px;
+      }
+
+      .patterns-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+        margin-bottom: 40px;
+      }
+
+      .pattern-category {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        border-left: 4px solid #667eea;
+      }
+      .category-title {
+        color: #495057;
+        margin-bottom: 15px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .pattern-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .pattern-btn {
+        background: white;
+        border: 2px solid #e0e0e0;
+        color: #495057;
+        padding: 12px 16px;
+        border-radius: 8px;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+      }
+      .pattern-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateX(5px);
+      }
+      .pattern-btn .icon {
+        font-size: 18px;
+        width: 24px;
+      }
+
+      .result-section {
+        margin-top: 40px;
+      }
+
+      .result {
+        margin-top: 20px;
+        padding: 25px;
+        background: #f5f5f5;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        display: none;
+      }
+      .result.show {
+        display: block;
+      }
+
+      .regex-output {
+        font-family: 'Courier New', monospace;
+        background: #2d2d2d;
+        color: #4af626;
+        padding: 16px;
+        border-radius: 8px;
+        margin: 15px 0;
+        word-break: break-all;
+        font-size: 16px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+      .action-btn {
+        padding: 10px 20px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .action-btn:hover {
+        background: #5568d3;
+        transform: translateY(-1px);
+      }
+      .action-btn.copy {
+        background: #28a745;
+      }
+      .action-btn.copy:hover {
+        background: #218838;
+      }
+      .action-btn.test {
+        background: #ffc107;
+        color: #333;
+      }
+      .action-btn.test:hover {
+        background: #e0a800;
+      }
+
+      .test-section {
+        margin-top: 20px;
+        padding: 20px;
+        background: #fff3cd;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        display: none;
+      }
+      .test-section.show {
+        display: block;
+      }
+      .test-input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-family: monospace;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      .matches {
+        margin-top: 15px;
+        padding: 15px;
+        background: white;
+        border-radius: 6px;
+        font-family: monospace;
+        min-height: 60px;
+        color: #28a745;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      footer {
+        text-align: center;
+        color: white;
+        margin-top: 40px;
+        padding: 20px;
+        font-size: 14px;
+        opacity: 0.8;
+      }
+
+      @media (max-width: 768px) {
+        .patterns-grid {
+          grid-template-columns: 1fr;
+        }
+        .donation-buttons {
+          flex-direction: column;
+        }
+        .donation-btn {
+          width: 100%;
+        }
+        .main-content {
+          padding: 20px;
+        }
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1><i class="fas fa-code"></i> Regex для людей</h1>
+        <p class="subtitle">Готовые регулярные выражения в один клик</p>
+
+        <div class="donation-section">
+          <div class="donation-iframe" id="donationContainer"></div>
+        </div>
+      </header>
+
+      <div class="main-content">
+        <div class="section-title">
+          <i class="fas fa-bolt"></i>
+          <span>Быстрые шаблоны</span>
+        </div>
+
+        <div class="patterns-grid">
+          <!-- Контакты -->
+          <div class="pattern-category">
+            <div class="category-title">📧 Контакты</div>
+            <div class="pattern-buttons">
+              <button class="pattern-btn" onclick="selectPattern('email')">
+                <span class="icon">📧</span>
+                <span>Email адреса</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('phone')">
+                <span class="icon">📞</span>
+                <span>Телефоны (+7 или 8)</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('gmail')">
+                <span class="icon">📨</span>
+                <span>Gmail адреса</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Веб и сеть -->
+          <div class="pattern-category">
+            <div class="category-title">🌐 Веб и сеть</div>
+            <div class="pattern-buttons">
+              <button class="pattern-btn" onclick="selectPattern('url')">
+                <span class="icon">🔗</span>
+                <span>URL ссылки</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('ip')">
+                <span class="icon">🖥️</span>
+                <span>IP адреса</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('hashtag')">
+                <span class="icon">#️⃣</span>
+                <span>Хэштеги</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Даты и время -->
+          <div class="pattern-category">
+            <div class="category-title">📅 Даты и время</div>
+            <div class="pattern-buttons">
+              <button class="pattern-btn" onclick="selectPattern('date_strict')">
+                <span class="icon">📅</span>
+                <span>Даты DD.MM.YYYY</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('date_simple')">
+                <span class="icon">📆</span>
+                <span>Даты (простой формат)</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('time')">
+                <span class="icon">⏰</span>
+                <span>Время HH:MM</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Текст и числа -->
+          <div class="pattern-category">
+            <div class="category-title">🔤 Текст и числа</div>
+            <div class="pattern-buttons">
+              <button class="pattern-btn" onclick="selectPattern('word')">
+                <span class="icon">🔤</span>
+                <span>Слова (3-10 букв)</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('number')">
+                <span class="icon">🔢</span>
+                <span>Целые числа</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('error_start')">
+                <span class="icon">🚨</span>
+                <span>Строки начинающиеся с ERROR</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Специальные -->
+          <div class="pattern-category">
+            <div class="category-title">🎯 Специальные</div>
+            <div class="pattern-buttons">
+              <button class="pattern-btn" onclick="selectPattern('password')">
+                <span class="icon">🔒</span>
+                <span>Пароли (сложные)</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('username')">
+                <span class="icon">👤</span>
+                <span>Имена пользователей</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('hex_color')">
+                <span class="icon">🎨</span>
+                <span>Цвета в HEX</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Форматы данных -->
+          <div class="pattern-category">
+            <div class="category-title">📊 Форматы данных</div>
+            <div class="pattern-buttons">
+              <button class="pattern-btn" onclick="selectPattern('uuid')">
+                <span class="icon">🆔</span>
+                <span>UUID</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('mac_address')">
+                <span class="icon">🔌</span>
+                <span>MAC адрес</span>
+              </button>
+              <button class="pattern-btn" onclick="selectPattern('credit_card')">
+                <span class="icon">💳</span>
+                <span>Номер карты</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-section">
+          <div class="section-title">
+            <i class="fas fa-magic"></i>
+            <span>Ваш результат</span>
+          </div>
+
+          <div id="result" class="result">
+            <div style="margin-bottom: 15px">
+              <strong style="color: #495057">Описание:</strong>
+              <div id="patternDescription" style="margin-top: 5px; color: #666"></div>
+            </div>
+
+            <div style="margin-bottom: 15px">
+              <strong style="color: #495057">Регулярное выражение:</strong>
+              <div class="regex-output" id="output"></div>
+            </div>
+
+            <div style="margin-bottom: 20px">
+              <strong style="color: #495057">Пример:</strong>
+              <div
+                id="patternExample"
+                style="margin-top: 5px; color: #666; font-family: monospace"></div>
+            </div>
+
+            <div class="action-buttons">
+              <button class="action-btn copy" onclick="copyRegex()">
+                <i class="fas fa-copy"></i>
+                Копировать Regex
+              </button>
+              <button class="action-btn copy" onclick="copyRegexWithFlags()">
+                <i class="fas fa-flag"></i>
+                Копировать с флагами
+              </button>
+              <button class="action-btn test" onclick="toggleTest()">
+                <i class="fas fa-vial"></i>
+                Протестировать
+              </button>
+            </div>
+
+            <div class="test-section" id="testSection">
+              <strong style="color: #856404">Проверьте на своих данных:</strong>
+              <textarea
+                id="testInput"
+                class="test-input"
+                placeholder="Введите текст для проверки..."
+                rows="3"
+                maxlength="5000"></textarea>
+              <div id="matches" class="matches">Введите текст выше...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>Создано с ❤️ для разработчиков | Regex для людей © 2024</p>
+        <p style="margin-top: 10px; font-size: 12px">
+          <i class="fas fa-shield-alt"></i> Все вычисления выполняются локально в вашем браузере
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      'use strict';
+
+      // Функция для санитизации HTML
+      function escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return '';
+        return unsafe
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // ========== БИБЛИОТЕКА РЕГУЛЯРНЫХ ВЫРАЖЕНИЙ ==========
+      const patterns = {
+        // Контакты
+        email: {
+          regex: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}',
+          description: 'Находит стандартные email адреса',
+          example: 'user@example.com, john.doe+tag@domain.co.uk',
+          category: 'Контакты',
+        },
+        phone: {
+          regex: '(?:\\+7|8)[ \\-]?\\(?\\d{3}\\)?[ \\-]?\\d{3}[ \\-]?\\d{2}[ \\-]?\\d{2}',
+          description: 'Российские номера телефонов (+7 или 8)',
+          example: '+79161234567, 8 (916) 123-45-67',
+          category: 'Контакты',
+        },
+        gmail: {
+          regex: '[a-zA-Z0-9._%+-]+@gmail\\.com',
+          description: 'Email адреса только на gmail.com',
+          example: 'user@gmail.com, john.doe@gmail.com',
+          category: 'Контакты',
+        },
+
+        // Веб и сеть
+        url: {
+          regex: 'https?://[^\\s]+',
+          description: 'HTTP/HTTPS ссылки',
+          example: 'https://example.com, http://google.com/path',
+          category: 'Веб и сеть',
+        },
+        ip: {
+          regex:
+            '\\b(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b',
+          description: 'IPv4 адреса (каждый октет 0-255)',
+          example: '192.168.1.1, 10.0.0.1, 255.255.255.255',
+          category: 'Веб и сеть',
+        },
+        hashtag: {
+          regex: '#[a-zA-Zа-яА-ЯёЁ0-9_]+',
+          description: 'Хэштеги (начинаются с #)',
+          example: '#regex, #программирование, #test123',
+          category: 'Веб и сеть',
+        },
+
+        // Даты и время
+        date_strict: {
+          regex: '\\b(?:0[1-9]|[12][0-9]|3[01])[./-](?:0[1-9]|1[0-2])[./-](?:19|20)\\d{2}\\b',
+          description: 'Даты в формате DD.MM.YYYY (дни 01-31, месяцы 01-12, годы 1900-2099)',
+          example: '31.12.2023, 01.01.2024, 15.03.2024',
+          category: 'Даты и время',
+        },
+        date_simple: {
+          regex: '\\b\\d{2}[./-]\\d{2}[./-]\\d{4}\\b',
+          description:
+            'Даты в формате две цифры, разделитель, две цифры, разделитель, четыре цифры',
+          example: '99.99.9999, 01/01/2023, 15-03-2024',
+          category: 'Даты и время',
+        },
+        time: {
+          regex: '\\b(?:[01]?[0-9]|2[0-3]):[0-5][0-9]\\b',
+          description: 'Время в формате HH:MM (24-часовой)',
+          example: '14:30, 09:45, 23:59',
+          category: 'Даты и время',
+        },
+
+        // Текст и числа
+        word: {
+          regex: '\\b\\w{3,10}\\b',
+          description: 'Слова от 3 до 10 символов (буквы, цифры, подчеркивание)',
+          example: 'hello, world123, test_word',
+          category: 'Текст и числа',
+        },
+        number: {
+          regex: '\\b\\d+\\b',
+          description: 'Целые числа',
+          example: '123, 4567, 890',
+          category: 'Текст и числа',
+        },
+        error_start: {
+          regex: '^ERROR.*',
+          description: 'Строки, начинающиеся с ERROR',
+          example: 'ERROR: File not found, ERROR 404',
+          category: 'Текст и числа',
+        },
+
+        // Специальные
+        password: {
+          regex: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$',
+          description:
+            'Сложные пароли (мин. 8 символов, буквы в обоих регистрах, цифры, спецсимволы)',
+          example: 'Password123!, Secure@2026',
+          category: 'Специальные',
+        },
+        username: {
+          regex: '^[a-zA-Z0-9_]{3,20}$',
+          description: 'Имена пользователей (3-20 символов, буквы, цифры, подчеркивание)',
+          example: 'john_doe, user123, admin',
+          category: 'Специальные',
+        },
+        hex_color: {
+          regex: '^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$',
+          description: 'Цвета в HEX формате (#RGB или #RRGGBB)',
+          example: '#fff, #ffffff, #1a2b3c',
+          category: 'Специальные',
+        },
+
+        // Форматы данных
+        uuid: {
+          regex: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+          description: 'UUID (версии 1-5)',
+          example: '123e4567-e89b-12d3-a456-426614174000',
+          category: 'Форматы данных',
+        },
+        mac_address: {
+          regex: '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$',
+          description: 'MAC адреса (с разделителями : или -)',
+          example: '00:1A:2B:3C:4D:5E, 00-1A-2B-3C-4D-5E',
+          category: 'Форматы данных',
+        },
+        credit_card: {
+          regex: '^\\d{4}[ -]?\\d{4}[ -]?\\d{4}[ -]?\\d{4}$',
+          description: 'Номера банковских карт (16 цифр с разделителями)',
+          example: '1234 5678 9012 3456, 1234-5678-9012-3456',
+          category: 'Форматы данных',
+        },
+      };
+
+      // ========== DOM ЭЛЕМЕНТЫ ==========
+      const resultEl = document.getElementById('result');
+      const outputEl = document.getElementById('output');
+      const patternDescriptionEl = document.getElementById('patternDescription');
+      const patternExampleEl = document.getElementById('patternExample');
+      const testSectionEl = document.getElementById('testSection');
+      const testInput = document.getElementById('testInput');
+      const matchesEl = document.getElementById('matches');
+      const donationContainer = document.getElementById('donationContainer');
+
+      // ========== ПЕРЕМЕННЫЕ ==========
+      let currentPattern = null;
+      let currentRegex = null;
+      let currentFlags = 'g'; // Флаги по умолчанию
+
+      // ========== ВЫБОР ПАТТЕРНА ==========
+      function selectPattern(patternId) {
+        const pattern = patterns[patternId];
+        if (!pattern) return;
+
+        currentPattern = pattern;
+        currentRegex = pattern.regex;
+
+        // Обновляем отображение
+        patternDescriptionEl.textContent = pattern.description;
+        patternExampleEl.textContent = pattern.example;
+        outputEl.textContent = '/' + currentRegex + '/' + currentFlags;
+
+        // Показываем результат
+        resultEl.classList.add('show');
+        testSectionEl.classList.remove('show');
+        testInput.value = '';
+        matchesEl.textContent = 'Введите текст для проверки...';
+
+        // Прокручиваем к результату
+        resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // ========== ДОНАТЫ ==========
+      function showDonationIframe() {
+        donationContainer.innerHTML = `
+          <iframe 
+            src="https://yoomoney.ru/quickpay/fundraise/button?billNumber=1F49C0D24DA.260106&" 
+            width="330" 
+            height="50" 
+            frameborder="0" 
+            allowtransparency="true" 
+            scrolling="no"
+            style="border-radius: 8px; margin-top: 10px; display: block; margin-left: auto; margin-right: auto;">
+          </iframe>
+          <p style="color: white; margin-top: 10px; font-size: 14px; text-align: center;">
+            <i class="fas fa-lock"></i> Безопасные платежи через ЮMoney
+          </p>
+        `;
+      }
+
+      // ========== КОПИРОВАНИЕ ==========
+      function copyRegex() {
+        if (!currentRegex) {
+          alert('Сначала выберите шаблон!');
+          return;
+        }
+
+        navigator.clipboard
+          .writeText(currentRegex)
+          .then(() => {
+            showToast('✅ Regex скопирован в буфер!');
+          })
+          .catch((err) => {
+            showToast('❌ Ошибка копирования: ' + err.message);
+          });
+      }
+
+      function copyRegexWithFlags() {
+        if (!currentRegex) {
+          alert('Сначала выберите шаблон!');
+          return;
+        }
+
+        const text = '/' + currentRegex + '/' + currentFlags;
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            showToast('✅ Regex с флагами скопирован!');
+          })
+          .catch((err) => {
+            showToast('❌ Ошибка копирования: ' + err.message);
+          });
+      }
+
+      // ========== ТЕСТИРОВАНИЕ ==========
+      function toggleTest() {
+        if (!currentRegex) {
+          alert('Сначала выберите шаблон!');
+          return;
+        }
+
+        const willShow = !testSectionEl.classList.contains('show');
+        testSectionEl.classList.toggle('show', willShow);
+
+        if (willShow && testInput.value.trim()) {
+          testRegex();
+        }
+      }
+
+      function testRegex() {
+        if (!currentRegex) return;
+
+        const testText = testInput.value;
+        if (!testText.trim()) {
+          matchesEl.textContent = 'Введите текст для проверки...';
+          return;
+        }
+
+        // Ограничиваем длину текста
+        if (testText.length > 5000) {
+          matchesEl.innerHTML =
+            '<span style="color: #dc3545">⚠️ Текст слишком длинный! Максимум 5000 символов.</span>';
+          return;
+        }
+
+        try {
+          // Тайм-аут для защиты от ReDoS
+          const startTime = Date.now();
+          const re = new RegExp(currentRegex, currentFlags);
+          const matches = testText.match(re);
+          const executionTime = Date.now() - startTime;
+
+          if (executionTime > 1000) {
+            matchesEl.innerHTML =
+              '<span style="color: #ffc107">⚠️ Предупреждение: regex выполнялся ' +
+              executionTime +
+              'мс</span>';
+            return;
+          }
+
+          if (matches && matches.length > 0) {
+            const limitedMatches = matches.slice(0, 10);
+            matchesEl.innerHTML =
+              '<span style="color: #28a745">✅ Найдено совпадений: ' +
+              matches.length +
+              '</span><br>' +
+              limitedMatches
+                .map(
+                  (m, i) =>
+                    '<div style="margin: 2px 0;">' +
+                    '<span style="color: #6c757d">' +
+                    (i + 1) +
+                    '.</span> ' +
+                    '<code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">"' +
+                    escapeHtml(m) +
+                    '"</code>' +
+                    '</div>',
+                )
+                .join('') +
+              (matches.length > 10
+                ? '<div style="color: #6c757d; margin-top: 5px;">... и ещё ' +
+                  (matches.length - 10) +
+                  ' совпадений</div>'
+                : '');
+          } else {
+            matchesEl.innerHTML = '<span style="color: #dc3545">❌ Совпадений не найдено</span>';
+          }
+        } catch (err) {
+          matchesEl.innerHTML =
+            '<span style="color: #dc3545">⚠️ Ошибка при выполнении regex:</span><br>' +
+            '<code style="color: #dc3545; font-size: 12px;">' +
+            escapeHtml(err.message) +
+            '</code>';
+        }
+      }
+
+      // Тестирование при вводе текста (с дебаунсом)
+      let testTimeout = null;
+      testInput.addEventListener('input', function () {
+        clearTimeout(testTimeout);
+        testTimeout = setTimeout(testRegex, 300);
+      });
+
+      // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+      function showToast(message) {
+        // Создаем toast уведомление
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #333;
+          color: white;
+          padding: 12px 24px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          z-index: 1000;
+          font-size: 14px;
+          animation: slideIn 0.3s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.animation = 'slideOut 0.3s ease';
+          setTimeout(() => document.body.removeChild(toast), 300);
+        }, 3000);
+      }
+
+      // Добавляем CSS анимации
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        @keyframes slideOut {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+
+      // ========== ИНИЦИАЛИЗАЦИЯ ==========
+      // Автоматически показываем первый шаблон
+      setTimeout(() => {
+        selectPattern('email');
+      }, 100);
+
+      // Инициализируем донаты
+      showDonationIframe();
+    </script>
+  </body>
+</html>
